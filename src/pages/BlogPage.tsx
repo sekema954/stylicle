@@ -11,7 +11,7 @@ function BlogPage() {
     }
   return (
     <section className="py-16">
-        <div className="flex flex-col items-center justify-center px-36 gap-10">
+        <div className="flex flex-col items-center justify-center lg:px-36 px-4 gap-10">
            <h1
            style={{fontFamily: FONTS.titleFont}}
            className="text-4xl font-bold">{blog.title}

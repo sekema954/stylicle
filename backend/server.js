@@ -5,8 +5,13 @@ const cors = require('cors');
 const app = express();
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const user = require("../backend/models/user_schema");
+const path = require('path');
+const fs = require('fs');
 
 app.use(bodyParser.json());
+app.use(express.json());
 app.use(cors());
 
 const transporter = nodemailer.createTransport({
@@ -51,13 +56,51 @@ app.post('/subscribe', async (req, res)=>{
         console.error('Error sending email:', error);
         res.status(500).send('Error sending email');
     }
-})
+});
 
 
 
+//connect to mongodb
+mongoose
+    .connect(process.env.MONGODB_URI, {})
+    .then(()=>console.log("Connected to MongoDB"))
+    .catch((err)=>console.error("MongoDB Connection Error: ", err))
 
-app.get('/', (req, res)=>{
-    res.send('Welcome');
+
+//Register endpoint 
+app.post('/api/register', async (req, res)=>{
+    try {
+        const {name, email, password} = req.body;
+        if(!name || !email || !password) {
+            return res.status(400).json({message: "All fields required"});
+        }
+
+        //check if user exits already
+        const existingUser = await user.findOne({ email });
+        if(existingUser) {
+            return res.status(400).json({message: "User Already Exists!"});
+        }
+
+        //create new user
+        const newUser = new user({ name, email, password });
+        await newUser.save();
+        res.status(201).json({message: "User registered Successfully."});
+    } catch(error) {
+        console.error('Error', error);
+        res.status(500).json({ message: "Server Error"});
+    }
+});
+
+
+//Login user
+
+
+//server frontend to the backend
+const frontendPath = path.join(__dirname,  '../dist');
+app.use(express.static(frontendPath));
+
+app.get('*', (req, res)=>{
+    res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 app.listen(PORT, ()=>{

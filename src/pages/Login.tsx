@@ -1,14 +1,40 @@
-import { useEffect, useRef } from "react";
+import { useRef, useState } from "react";
 import { gsap } from "gsap";
 import { FONTS } from "../constants/styles";
 import image from "../assets/images/Photo.png";
 import googleIcon from "../assets/images/google.png";
+import { useGSAP } from "@gsap/react";
 
 function Login() {
   const leftGridRef = useRef<HTMLDivElement>(null);
   const textRefs = useRef<(HTMLHeadingElement | HTMLParagraphElement | HTMLButtonElement)[]>([]);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  useEffect(() => {
+
+  const handleChange  = (event:any) =>{
+    const { name, value} = event.target;
+    setFormData((prevFormData)=>({
+      ...prevFormData,
+      [name]: value
+    }));
+  };
+
+
+  const handleSubmit = (event:any) => {
+    event.preventDefault();
+    if(!formData.email || formData.password) {
+      setErrorMsg("All fields required");
+      alert(errorMsg);
+      return
+    }
+  };
+
+
+  useGSAP(() => {
     // Left grid animation
     if (leftGridRef.current) {
       gsap.fromTo(
@@ -46,7 +72,7 @@ function Login() {
         </div>
 
         {/** Right Grid */}
-        <div className="px-20 flex flex-col justify-center">
+        <div className="px-20 py-5 flex flex-col justify-center">
           <header>
             <h1
               style={{ fontFamily: FONTS.titleFont }}
@@ -75,14 +101,18 @@ function Login() {
           </header>
 
           {/** Form elements */}
-          <form className="mt-3 flex flex-col gap-10">
+          <form
+          onSubmit={handleSubmit}
+          className="mt-3 flex flex-col gap-10">
 
             <div className="flex flex-col">
               <label htmlFor="email">Email:</label>
               <input
+                onChange={handleChange}
                 className="w-full border-b border-b-black px-3 py-3"
                 type="email"
                 name="email"
+                value={formData.email}
                 id="email"
                 placeholder="Enter Your Email"
                 aria-label="Input box to enter your email"
@@ -92,9 +122,11 @@ function Login() {
             <div className="flex flex-col">
               <label htmlFor="password">Password:</label>
               <input
+                onChange={handleChange}
                 className="w-full border-b border-b-black px-3 py-3"
                 type="password"
                 name="password"
+                value={formData.password}
                 id="password"
                 placeholder="Enter Your Password"
                 aria-label="Input box to enter your password"

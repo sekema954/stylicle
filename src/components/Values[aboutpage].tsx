@@ -4,7 +4,7 @@ import icon2 from '../assets/images/great_service.png';
 import icon3 from '../assets/images/genuine.png';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);
